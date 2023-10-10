@@ -5,7 +5,7 @@ const map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/mapbox/streets-v12',
   center: [-70.654191, -33.44395],
-  zoom: 15,
+  zoom: 9,
 });
 
 const script = document.createElement('script');
