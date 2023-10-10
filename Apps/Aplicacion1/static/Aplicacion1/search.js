@@ -27,6 +27,5 @@ function setupMap(center) {
     language: 'es',
     unit: 'metric'
   });
-  
   map.addControl(directions, 'top-left');
 }
