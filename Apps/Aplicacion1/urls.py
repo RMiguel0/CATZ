@@ -4,7 +4,10 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('', views.home)
+    path('', views.home, name='home'),
+    path('login/', views.signup, name='login'),
+    path('profile/', views.profile, name='profile'),
+    path('logout/', views.singout, name='singout')
 ]
 
 if settings.DEBUG:
