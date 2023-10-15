@@ -1,9 +1,89 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
-<h1>
-    ESTE ES TU PERFIL
-</h1>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<h1>Profile</h1>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" 
+    type="text/css">
+<style>
+    body { margin: 0; padding: 0; }
+    #map {
+    position: absolute;
+    top: 50%; 
+    left: 65%; 
+    transform: translate(-50%, -50%); 
+    width: 65%; 
+    height: 75%; 
+}
+    </style>
+    </head>
+    <body>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+        
+    <style>
+    .geocoder {
+        position: absolute;
+        z-index: 1;
+        width: 40%;
+        left: 67%;
+        margin-left: -20%;
+        top: 14%;
+    }
+    .mapboxgl-ctrl-geocoder {
+        min-width: 100%;
+    }
+    </style>
+</head>
+<body>
 
+<div id="map"></div>
+
+<div id="geocoder" class="geocoder"></div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dDdybThnMmkifQ.uhdlXK3odioAdWo0OOogwA';
+
+navigator.geolocation.getCurrentPosition(successLocation, erroLocation, { enableHighAccuracy: true });
+
+function successLocation(position) {
+    console.log(position)
+    setupMap([position.coords.longitude, position.coords.latitude])
+}
+
+function erroLocation() {
+    setupMap([-70.654191, -33.44395])
+}
+
+function setupMap(center) {
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v12',
+    center: center,
+    zoom: 15
+}) 
+
+const geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl
+});
+
+document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+
+const nav = new mapboxgl.NavigationControl();
+map.addControl(nav)
+}
+</script>
+
+</body>
+</html>
 {% endblock %}
