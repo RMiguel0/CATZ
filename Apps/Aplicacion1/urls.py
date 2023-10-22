@@ -7,7 +7,8 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('login/', views.signup, name='login'),
     path('profile/', views.profile, name='profile'),
-    path('logout/', views.singout, name='singout')
+    path('logout/', views.singout, name='singout'),
+    path('clima/', views.clima, name='aire')
 ]
 
 if settings.DEBUG:

@@ -62,3 +62,7 @@ def signin(request):
         else:
             login(request, user)
             return redirect('home')
+        
+
+def clima(request):
+    return render(request, "clima.html")
