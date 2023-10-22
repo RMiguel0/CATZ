@@ -1,37 +1,39 @@
+{% load static %}
 <!DOCTYPE html>
+
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'Aplicacion1/estilos.css' %}"> 
     <title>CATZ</title>
 </head>
 <body>
+    <header>
+        <a href="#" class="logo">
 
-    <nav>
-        <ul>
-            <li>
-                <a href="/">Home</a>
-            </li>
-            {% if user.is_authenticated %}
-            <li>
-                <a href="/logout">Log Out</a>
-            </li>
-            <li>
-                <a href="/profile">Profile</a>
-            </li>
+            <img src="{% static 'Aplicacion1/logoxd/gatolechuga.png' %}" alt="logo" class="logo img">
+            <h2 class="CATZ">Calidad del Aire en Tu Zona</h2>
+        </div>
+        <nav>
+            <a href="{% url 'home' %}" class=" nav-link" >Inicio</a>
+            {% if not user.is_authenticated %}
+                <a href="/singin" class=" nav-link" >Ingresar</a>
+                <a href="{% url 'login' %}" class=" nav-link" >Registrarme</a>
             {% else %}
-            <li>
-                <a href="/login">Sing Up</a>
-            </li>
-            <li>
-                <a href="/singin">Sing In</a>
-            </li>
+                <a href="{% url 'singout' %}" class=" nav-link" >Cerrar Sesión</a>
+                <a href="{% url 'profile' %}" class=" nav-link" >Perfil</a>
             {% endif %}
-        </ul>
-    </nav>
-    
-    {% block content %}
-    {% endblock %}
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+ 
+        
+
 
 </body>
 </html>
