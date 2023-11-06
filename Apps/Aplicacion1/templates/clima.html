@@ -1,91 +1,36 @@
 {% extends 'base.html' %}
+
 {% block content %}
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Catz</title>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css">
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
-    <style>
-        body { margin: 0; padding: 0; }
-        #map {
-            position: absolute;
-            top: 55%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            height: 80%;
+<h1>Información de AQI US</h1>
+
+<label for="ciudad">Ingrese la ciudad:</label>
+<input type="text" id="ciudad"><br><br>
+
+<button onclick="obtenerInformacion()">Obtener AQI US</button><br><br>
+
+<div id="resultado"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+function obtenerInformacion() {
+    var ciudad = document.getElementById('ciudad').value;
+
+function obtenerInformacion() {
+    var ciudad = document.getElementById('ciudad').value;
+
+    $.ajax({
+        url: '/ruta_de_tu_vista/',  // Reemplaza con la URL de tu vista
+        data: {
+            ciudad: ciudad
+        },
+        success: function(response) {
+            var resultado = response.aqius;
+            var ciudad = response.ciudad;
+            document.getElementById('resultado').innerHTML = `AQI US para ${ciudad}: ${resultado}`;
         }
-        #city-aqi-container {
-            position: absolute;
-            top: 105px;
-            left: 10px;
-        }
-    </style>
-    <script type="text/javascript" charset="utf-8">
-        var map; // Variable para el mapa
-
-        (function(w, d, t, f) {
-            w[f] = w[f] || function(c, k, n) {
-                s = w[f], k = s['k'] = (s['k'] || (k ? ('&k=' + k) : ''));
-                s['c'] =
-                    c = (c instanceof Array) ? c : [c];
-                s['n'] = n = n || 0;
-                L = d.createElement(t), e = d.getElementsByTagName(t)[0];
-                L.async = 1;
-                L.src = '//feed.aqicn.org/feed/' + (c[n].city) + '/' + (c[n].lang || '') + '/feed.v1.js?n=' + n + k;
-                e.parentNode.insertBefore(L, e);
-            };
-        })(window, document, 'script', '_aqiFeed');
-    </script>
-</head>
-<body>
-
-    <div id='map' style='height:750px;'></div>
-    <div id="city-aqi-container"></div>
-
-    <script>
-        var OSM_URL = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        var OSM_ATTRIB = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-        var osmLayer = L.tileLayer(OSM_URL, { attribution: OSM_ATTRIB });
-
-        var WAQI_URL = "https://tiles.waqi.info/tiles/usepa-aqi/{z}/{x}/{y}.png?token=93467139e3a2fe6f3fb7d421d5d88ab634ef67d9";
-        var WAQI_ATTR = 'Air Quality Tiles &copy; <a href="http://waqi.info">waqi.info</a>';
-        var waqiLayer = L.tileLayer(WAQI_URL, { attribution: WAQI_ATTR });
-
-        // Incorpora geolocalización
-        navigator.geolocation.getCurrentPosition(successLocation, erroLocation, { enableHighAccuracy: true });
-
-        function successLocation(position) {
-            console.log(position);
-            setupMap([position.coords.latitude, position.coords.longitude]);
-        }
-
-        function erroLocation() {
-            setupMap([ -33.44395,-70.654191]);
-        }
-
-        function setupMap(center) {
-            if (map) {
-                // Si el mapa ya se ha inicializado, simplemente cambia su vista
-                map.setView(center, 13);
-               
-
-            } else {
-                // Si el mapa no se ha inicializado, créalo y añade capas
-                map = L.map('map').setView(center, 13);
-                map.addLayer(osmLayer).addLayer(waqiLayer);
-
-                // Llama a la función _aqiFeed con la posición actual
-                _aqiFeed({ container: "city-aqi-container", city: "santiago", display: "%cityname %aqi<br><small> ultimo registro %date</small>", lang: "es" });
-            }
-        }
-    </script>
-</body>
-</html>
-
-
-
+    });
+}
+</script>
+}
+</script>
 {% endblock %}
