@@ -29,10 +29,36 @@ body{
     backdrop-filter: blur(5px);
 }
 
+.map{
+    position: absolute;
+    top: 70%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    border-radius: 10px;
+    }
+
+.geocoder {
+    position: absolute;
+    z-index: 1;
+    width: 50%;
+    left: 50%;
+    margin-left: -25%;
+    top: 17%;
+    border-radius: 10px;
+
+}
+
+.mapboxgl-ctrl-geocoder {
+    min-width: 80%;
+    border-radius: 10px;
+
+}
 
 .container{
     position: absolute;
-    top: 20%;
+    top: 30%;
     width: 400px;
     height: 105px;
     margin-left: 40px;
@@ -44,11 +70,39 @@ body{
     transition: 0.6s ease-out;
 }
 
-.pointer i{
-    position: absolute;
-    color: #06283D;
-    font-size: 28px;
+.pointer {
+    position: relative;
 }
+
+.pointer i {
+    color: #06283D;
+    font-size: 50px;
+}
+
+.ubicacion {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 2;
+}
+
+span.ubicacion{
+    color: #06283D;
+    position: absolute;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.ubicacion p {
+    color: #06283D;
+    font-size: 90%;
+    font-weight: 500;
+    text-transform: capitalize;
+    margin-top: 10px; /* Ajusta el espacio entre .ubicacion y el texto según tus necesidades */
+}
+
 
 .aqi-box span{
     width: 100%;
@@ -167,4 +221,29 @@ body{
         scale: 1;
         opacity: 1;
     }
+}
+
+
+.texto {
+    position: fixed;
+    width: auto;
+    height: auto;
+    background: rgba(255, 255, 255, 0.8); /* Fondo blanco transparente */
+    padding: 28px 32px;
+    overflow: hidden;
+    border-radius: 18px;
+    font-family: "poppins", sans-serif;
+    transition: 0.6s ease-out;
+    left: 55%; /* Centrar horizontalmente */
+    top: 30%; /* Ajustar la posición vertical según tus necesidades */
+    transform: translateX(-50%);
+    z-index: 999; /* Asegura que esté por encima del mapa u otros elementos */
+}
+
+.texto p {
+    color: #06283D;
+    font-size: 100%;
+    font-weight: 500;
+    text-transform: capitalize;
+    margin-top: 10px;
 }

@@ -6,12 +6,15 @@ from django.http import HttpResponse, JsonResponse
 from django.db import IntegrityError
 import requests, os
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import CreateView
 
 
 # Create your views here.
 
 
 def home(request):
+    ubicacion = request.POST.get('city')
+    print(ubicacion)
     return render(request, 'home.html')
 
 
@@ -123,7 +126,7 @@ def obtener_calidad_aire(ciudad, token_aqi):
             respuesta_ai = enviarCalidadAirea(calidad_aire)
             dic['aqi'] = calidad_aire
             dic['res'] = respuesta_ai['res']
-            dic['descrition'] = respuesta_ai['calidad']
+            dic['description'] = respuesta_ai['calidad']
             dic['pm10'] = pm10
             dic['pm25'] = pm25
             return dic
@@ -140,7 +143,7 @@ def obtener_calidad_aire(ciudad, token_aqi):
                 respuesta_ai = enviarCalidadAirea(calidad_aire)
                 dic['aqi'] = calidad_aire
                 dic['res'] = respuesta_ai['res']
-                dic['descrition'] = respuesta_ai['calidad']
+                dic['description'] = respuesta_ai['calidad']
                 dic['pm10'] = pm10
                 dic['pm25'] = pm25
                 return dic
@@ -184,14 +187,18 @@ def enviarCalidadAirea(calidad_aire):
         return res
     
 
+
 @csrf_exempt
 def recibir_ubicacion(request):
-    if request.method == 'POST':
+    if request.method == 'GET':
+        return render(request, 'home.html')
+    
+    else:
         ubicacion = request.POST.get('city')
         calidad_aire1 = obtener_calidad_aire(ubicacion, token_aqi)
         respuesta_ai = calidad_aire1['res']
-        print(respuesta_ai)
-        return JsonResponse(calidad_aire1)
-    else:
-        return render(request, 'home.html')
+        data = list(calidad_aire1.values())
+        print(calidad_aire1)
+        return JsonResponse({'res':calidad_aire1})
+        
         #return JsonResponse({'error': 'Método no permitido'}, status=405)

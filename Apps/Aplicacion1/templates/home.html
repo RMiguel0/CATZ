@@ -4,48 +4,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Catz</title>
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
-<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" 
-    type="text/css">
-<style>
-    body { margin: 0; padding: 0; }
-    #map {
-        position: absolute;
-        top: 55%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        height: 80%;
-    }
-    #widget-container {
-        position: absolute;
-        top: 18%;
-        left: 12%;
-    }
-</style>
-    </head>
-    <body>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Catz</title>
+    <meta name="viewport" content="width=device-width initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap"
+    rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" 
+        type="text/css">
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
-        
-    <style>
-    .geocoder {
-        position: absolute;
-        z-index: 1;
-        width: 50%;
-        left: 50%;
-        margin-left: -25%;
-        top: 17%;
-    }
-    .mapboxgl-ctrl-geocoder {
-        min-width: 80%;
-    }
-    </style>
+    <link rel="stylesheet" href="{% static '/style_widdget.css' %}">                                       
+</head>
+    <body>
     <script type="text/javascript" charset="utf-8">
         var map; // Variable para el mapa
 
@@ -64,102 +38,217 @@
     </script>
 </head>
 <body>
-<form id="/recibir_ubicacion/" method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="city" id="cityInput">
-</form>
+    <form id="/recibir_ubicacion/" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="city" id="cityInput">
+    </form>
 
-<div id="map"></div>
+    <div id="map" class="map"></div>
+
+    <div id="geocoder" class="geocoder"></div>
+
+    <div class="texto">
+        <span class="respues">
+            <p class="sugerenciaPlaceholder" id="sugerenciaPlaceholder"></p>
+        </span>
+    </div>
+
+    <div class="container">
+        <div class="pointer">
+            <i class="fa-solid fa-location-dot"></i>
+            <span class="ubicacion"></span>
+            <p>{{ city }}</p>
+        </div>
+
+        <div class="not-found">
+            <img src="{% static 'imagenes/404.png' %}">
+            <p>Oops! Ubicación invalida :/</p>
+        </div>
+
+        <div class="aqi-box">
+            <img src="">
+            <p class="temperature"></p>
+            <p class="description"></p>
+        </div>
+
+        <div class="aqi-details">
+            <div class="humidity">
+                <i class="fa-solid fa-wind"></i>
+                <div class="text">
+                    <span></span>
+                    <p>PM10</p>
+                </div>
+            </div>
+            <div class="wind">
+                <i class="fa-solid fa-smog"></i>
+                <div class="text">
+                    <span></span>
+                    <p>PM25</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 
-<div id="geocoder" class="geocoder"></div>
+    <script>
+        const container = document.querySelector('.container');
+        const aqiBox = document.querySelector('.aqi-box');
+        const aqiDetails = document.querySelector('.aqi-details');
+        const error404 = document.querySelector('.not-found');      
 
+        var selectedCity = " ";
+        var previousCity = null;
 
+        mapboxgl.accessToken = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dDdybThnMmkifQ.uhdlXK3odioAdWo0OOogwA';
 
-<script>
-var selectedCity = " ";
-var previousCity = null;
+        navigator.geolocation.getCurrentPosition(successLocation, erroLocation, { enableHighAccuracy: true });
 
-mapboxgl.accessToken = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dDdybThnMmkifQ.uhdlXK3odioAdWo0OOogwA';
+        function successLocation(position) {
+            console.log(position)
+            setupMap([position.coords.longitude, position.coords.latitude])
+        }
 
-navigator.geolocation.getCurrentPosition(successLocation, erroLocation, { enableHighAccuracy: true });
+        function erroLocation() {
+            setupMap([-70.654191, -33.44395])
+        }
 
-function successLocation(position) {
-    console.log(position)
-    setupMap([position.coords.longitude, position.coords.latitude])
-}
+        function setupMap(center) {
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: center,
+            zoom: 15
+        }) 
 
-function erroLocation() {
-    setupMap([-70.654191, -33.44395])
-}
-
-function setupMap(center) {
-const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v12',
-    center: center,
-    zoom: 15
-}) 
-
-const geocoder = new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken,
-    mapboxgl: mapboxgl,
-    placeholder: "Buscar sitio",
-});
-
-geocoder.on('result', function(ev) {
-                var selectedCity = ev.result.text; // Actualiza la variable con la nueva ubicación seleccionada
-                updateCityAqi(selectedCity); // Actualiza el feed del AQI con la nueva ciudad seleccionada
-            });
-
-document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
-
-const nav = new mapboxgl.NavigationControl();
-map.addControl(nav)
-
-_aqiFeed({ container: "city-aqi-container", 
-                        city: selectedCity, 
-                        display: "%details", 
-                        lang: "es",
-                    });
-}
-
-function updateCityAqi(city) {
-    if (city !== previousCity) {
-        previousCity = city;
-        document.getElementById('cityInput').value = city;
-        console.log('Ubicación actualizada:', city);
-
-        _aqiFeed({ 
-            container: "city-aqi-container", 
-            city: city,
-            display: "%details", 
-            lang: "es",
+        const geocoder = new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl,
+            placeholder: "Buscar sitio",
         });
 
-        sendLocationToServer(city);
-    }
-}
+        geocoder.on('result', function(ev) {
+                        var selectedCity = ev.result.text; // Actualiza la variable con la nueva ubicación seleccionada
+                        updateCityAqi(selectedCity); // Actualiza el feed del AQI con la nueva ciudad seleccionada
+                    });
 
-function sendLocationToServer(city) {
-    // Enviar la ubicación al servidor usando AJAX
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            console.log('Ubicación enviada correctamente');
-        } else {
-            console.error('Error al enviar la ubicación');
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav)
+
+        _aqiFeed({ container: "city-aqi-container", 
+                                city: selectedCity, 
+                                display: "%details", 
+                                lang: "es",
+                            });
         }
-    };
 
-    var data = 'city=' + encodeURIComponent(city);
-    xhr.send(data);
-}
+        function updateCityAqi(city) {
+            if (city !== previousCity) {
+                previousCity = city;
+                document.getElementById('cityInput').value = city;
+                console.log('Ubicación actualizada:', city);
 
-</script>
+                selectedCity = city;
+
+                // Actualiza el contenido HTML con la ciudad
+                document.querySelector('.ubicacion').textContent = city;
+
+                _aqiFeed({ 
+                    container: "city-aqi-container", 
+                    city: city,
+                    display: "%details", 
+                    lang: "es",
+                });
+
+                sendLocationToServer(city);
+            }
+        }
+
+        function sendLocationToServer(city) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'watch/', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        console.log('Ubicación enviada correctamente');
+                        var responseData = JSON.parse(xhr.responseText);
+                        console.log('Respuesta del servidor:', responseData);
+                        
+
+                        // Caching de elementos DOM
+                        const image = document.querySelector('.aqi-box img');
+                        const temperature = document.querySelector('.aqi-box .temperature');
+                        const description = document.querySelector('.aqi-box .description');
+                        const humidity = document.querySelector('.aqi-details .humidity span');
+                        const wind = document.querySelector('.aqi-details .wind span');
+
+                        // Asignación de valores
+                        image.src = getAqiImageSrc(responseData.res.description);
+                        temperature.innerHTML = responseData.res.aqi;
+                        description.innerHTML = responseData.res.description;
+                        humidity.innerHTML = responseData.res.pm10;
+                        wind.innerHTML = responseData.res.pm25;
+
+
+                        var sugerenciaElement = document.getElementById('sugerenciaPlaceholder');
+
+                        if (sugerenciaElement) {
+                            sugerenciaElement.innerHTML = responseData.res.res;
+                        }
+
+                        // Mostrar elementos
+                        aqiBox.style.display = '';
+                        aqiDetails.style.display = '';
+                        aqiBox.classList.add('fadeIn');
+                        aqiDetails.classList.add('fadeIn');
+                        container.style.height = '590px';
+
+                    } else {
+                        console.error('Error al enviar la ubicación');
+                        if (json.cod === '404') {
+                            container.style.height = '400px';
+                            aqiBox.style.display = 'none';
+                            aqiDetails.style.display = 'none';
+                            error404.style.display = 'block';
+                            error404.classList.add('fadeIn');
+                            return;
+                        }
+
+                        error404.style.display = 'none';
+                        error404.classList.remove('fadeIn');
+                    }
+                };
+
+                var data = 'city=' + encodeURIComponent(city);
+                xhr.send(data);
+            }
+
+            function getAqiImageSrc(description) {
+                switch (description) {
+                    case 'Excelente':
+                        return '../static/imagenes/1.png';
+                    case 'Moderada':
+                        return '../static/imagenes/2.png';
+                    case 'No saludables para grupos sensibles':
+                        return '../static/imagenes/3.png';
+                    case 'Insalubre':
+                        return '../static/imagenes/4.png';
+                    case 'Dañino':
+                        return '../static/imagenes/5.png';
+                    case 'Muy Dañino':
+                        return '../static/imagenes/6.png';
+                    default:
+                        return '';
+                }
+            }
+
+    </script>
+
+    <script src="https://kit.fontawesome.com/7c8801c017.js" crossorigin="anonymous"></script>
+
 </body>
 </html>
 {% endblock %}
