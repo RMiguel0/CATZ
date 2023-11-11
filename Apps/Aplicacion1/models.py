@@ -6,7 +6,7 @@ mapbox_access_token = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dD
 
 
 # Create your models here.
-class Direcciones(models.Model):
+class ubicaciones(models.Model):
     Direccion = models.TextField()
     Lat = models.FloatField()
     Long = models.FloatField()
@@ -14,6 +14,7 @@ class Direcciones(models.Model):
 
     def procesar_direccion(request):
         self.Direccion = direccion
+        return coords
 
     def obtener_coordenadas(self):
         url = f'https://api.mapbox.com/geocoding/v5/mapbox.places/{self.Direccion}.json?'

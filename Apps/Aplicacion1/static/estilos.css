@@ -14,8 +14,10 @@ header {
 }
 .logo
 {
-    display: flex;
+    position: absolute;
     align-items: center;
+    height: 50px;
+    width: 50px;
 }
 .logo img
 {

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Direcciones
+from .models import ubicaciones
 
 # Register your models here.
-admin.site.register(Direcciones)
+admin.site.register(ubicaciones)

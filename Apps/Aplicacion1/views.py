@@ -8,7 +8,7 @@ import requests, os
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Direcciones
+from .models import ubicaciones
 
 
 # Create your views here.
@@ -53,25 +53,25 @@ def profile(request):
         coordenadas = obtener_coordenadas(ubicacion)
         lat = coordenadas[0]
         longi = coordenadas[1]
-        nuevo_usuario = Direcciones(Direccion= ubicacion, Lat= lat, Long= longi, user=user)
+        nuevo_usuario = ubicaciones(Direccion= ubicacion, Lat= lat, Long= longi, user=user)
         nuevo_usuario.save()
         #return JsonResponse({'success': True})
     try:
-        direcciones = Direcciones.objects.filter(user=user)
-        atributos_direcciones = []
+        direcciones = ubicaciones.objects.filter(user=user)
+        atributos_ubicaciones = []
 
         # Itera sobre las direcciones y almacena sus atributos en la lista
-        for direccion in direcciones:
+        for ubicaciones in direcciones:
             atributos_direccion = {
-                'direccion': direccion.Direccion,
+                'direccion': ubicaciones.Direccion,
                 #'latitud': direccion.Lat,
                 #'longitud': direccion.Long,
                 # Agrega más atributos según sea necesario
             }
-            atributos_direcciones.append(atributos_direccion)
-    except Direcciones.DoesNotExist:
+            atributos_ubicaciones.append(atributos_direccion)
+    except ubicaciones.DoesNotExist:
         # Manejar el caso en el que no se encuentra ninguna dirección
-        direccion = None
+        atributos_direcciones = None
     return render(request, 'profile.html',{
         'direcciones': atributos_direcciones,
     })

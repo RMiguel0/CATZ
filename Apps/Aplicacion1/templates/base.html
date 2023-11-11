@@ -27,14 +27,8 @@ body {
             <img src="{% static 'Aplicacion1/logoxd/10338019.png' %}" alt="CATZ" />
             <h2 class="nombre">CATZ</h2>
         </div>
-<<<<<<< Updated upstream
         <ul>
             <li><a href="{% url 'home' %}">Inicio</a></li>
-            <li><a href="/clima">Aire</a></li>
-=======
-        <nav>
-            <a href="{% url 'home' %}" class=" nav-link" >Inicio</a>
->>>>>>> Stashed changes
             {% if not user.is_authenticated %}
             <li><a href="/singin">Ingresar</a></li>
             <li><a href="{% url 'login' %}">Registrarme</a></li>
