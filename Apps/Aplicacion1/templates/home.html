@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% block content %}
 {% load static %}
+{% block content %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,19 +13,6 @@
 <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" 
     type="text/css">
 <style>
-    body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-    #respuesta {
-        position: absolute;
-        bottom: -20%;
-        left: 5%; 
-        background-color: rgba(137, 243, 128, 0.8);
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-</style>
-<style>
     body { margin: 0; padding: 0; }
     #map {
         position: absolute;
@@ -35,7 +22,7 @@
         width: 80%;
         height: 80%;
     }
-    #city-aqi-container {
+    #widget-container {
         position: absolute;
         top: 18%;
         left: 12%;
@@ -84,9 +71,10 @@
 
 <div id="map"></div>
 
+
 <div id="geocoder" class="geocoder"></div>
 
-<div id="city-aqi-container"></div>
+
 
 <script>
 var selectedCity = " ";
@@ -172,12 +160,6 @@ function sendLocationToServer(city) {
 }
 
 </script>
-<div id="respuesta">
-    <h1>Calidad del Aire en {{ubicacion}}</h1>
-<p>Índice de Calidad del Aire: {{calidad_aire}}</p>
-<h2>Sugerencias para el Bienestar:</h2>
-<p>{{respuesta_ai}}</p>
-</div>
 </body>
 </html>
 {% endblock %}

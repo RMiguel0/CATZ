@@ -1,36 +1,61 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-<h1>Información de AQI US</h1>
 
-<label for="ciudad">Ingrese la ciudad:</label>
-<input type="text" id="ciudad"><br><br>
 
-<button onclick="obtenerInformacion()">Obtener AQI US</button><br><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap"
+    rel="stylesheet">
+    <link rel="stylesheet" href="{% static '/style_widdget.css' %}">
+</head>
+<body>
 
-<div id="resultado"></div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <div class="container">
+        <div class="pointer">
+            <i class="fa-solid fa-location-dot"></i>
+            <span class="ubicacion">{{ Ubicación }}</span>
+        </div>
 
-<script>
-function obtenerInformacion() {
-    var ciudad = document.getElementById('ciudad').value;
+        <div class="not-found">
+            <img src="{% static 'imagenes/404.png' %}">
+            <p>Oops! Ubicación invalida :/</p>
+        </div>
 
-function obtenerInformacion() {
-    var ciudad = document.getElementById('ciudad').value;
+        <div class="aqi-box">
+            <img src="">
+            <p class="temperature"></p>
+            <p class="description"></p>
+        </div>
 
-    $.ajax({
-        url: '/ruta_de_tu_vista/',  // Reemplaza con la URL de tu vista
-        data: {
-            ciudad: ciudad
-        },
-        success: function(response) {
-            var resultado = response.aqius;
-            var ciudad = response.ciudad;
-            document.getElementById('resultado').innerHTML = `AQI US para ${ciudad}: ${resultado}`;
-        }
-    });
-}
-</script>
-}
-</script>
+        <div class="aqi-details">
+            <div class="humidity">
+                <i class="fa-solid fa-wind"></i>
+                <div class="text">
+                    <span></span>
+                    <p></p>
+                </div>
+            </div>
+            <div class="wind">
+                <i class="fa-solid fa-smog"></i>
+                <div class="text">
+                    <span></span>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    
+
+    <script src="https://kit.fontawesome.com/7c8801c017.js" crossorigin="anonymous"></script>
+    <script src="{% static 'javas/index.js' %}"></script>
+</body>
+</html>
+
 {% endblock %}
