@@ -6,7 +6,9 @@ from django.http import HttpResponse, JsonResponse
 from django.db import IntegrityError
 import requests, os
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import CreateView
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from .models import Direcciones
 
 
 # Create your views here.
@@ -42,8 +44,37 @@ def signup(request):
         })
 
 
+@csrf_exempt
+@login_required
 def profile(request):
-    return render(request, 'profile.html')
+    user = request.user
+    if request.method =='POST':
+        ubicacion = request.POST.get('city')
+        coordenadas = obtener_coordenadas(ubicacion)
+        lat = coordenadas[0]
+        longi = coordenadas[1]
+        nuevo_usuario = Direcciones(Direccion= ubicacion, Lat= lat, Long= longi, user=user)
+        nuevo_usuario.save()
+        #return JsonResponse({'success': True})
+    try:
+        direcciones = Direcciones.objects.filter(user=user)
+        atributos_direcciones = []
+
+        # Itera sobre las direcciones y almacena sus atributos en la lista
+        for direccion in direcciones:
+            atributos_direccion = {
+                'direccion': direccion.Direccion,
+                #'latitud': direccion.Lat,
+                #'longitud': direccion.Long,
+                # Agrega más atributos según sea necesario
+            }
+            atributos_direcciones.append(atributos_direccion)
+    except Direcciones.DoesNotExist:
+        # Manejar el caso en el que no se encuentra ninguna dirección
+        direccion = None
+    return render(request, 'profile.html',{
+        'direcciones': atributos_direcciones,
+    })
 
 
 def singout(request):
@@ -96,7 +127,6 @@ def obtener_coordenadas(dirección):
         return None
 
 
-
 token_aqi = "a9fa736d75e0f33dc4a9ba18292eab99fa46eb4d"
 def calidad_coor(coords):
     url = f'https://api.waqi.info/feed/geo:{coords[0]};{coords[1]}/?token=a9fa736d75e0f33dc4a9ba18292eab99fa46eb4d'
@@ -118,8 +148,14 @@ def obtener_calidad_aire(ciudad, token_aqi):
         if response.status_code == 200 and data.get("status") == "ok":
             calidad_aire = data["data"]["aqi"]
             code = data['data']['idx']
-            pm10 = data['data']['iaqi']['pm10']['v']
-            pm25 = data['data']['iaqi']['pm25']['v']
+            if 'pm10' not in data['data']['iaqi']:
+                    pm10 = 'No se encontro registro'
+            else:
+                pm10 = data['data']['iaqi']['pm10']['v']
+            if 'pm25' not in data['data']['iaqi']:
+                pm25 = 'No se encontro registro'
+            else:
+                pm25 = data['data']['iaqi']['pm25']['v']
             print(f"La calidad aire del aire en {direccion} es: {calidad_aire}, codigo{code}")
 
             # Ahora, enviamos la calidad_aire del aire a OpenAI para obtener una respuesta_ai
@@ -137,8 +173,14 @@ def obtener_calidad_aire(ciudad, token_aqi):
                 data = calidad_coor(coords)
                 calidad_aire = data["data"]["aqi"]
                 code = data['data']['idx']
-                pm10 = data['data']['iaqi']['pm10']['v']
-                pm25 = data['data']['iaqi']['pm25']['v']
+                if 'pm10' not in data['data']['iaqi']:
+                    pm10 = 'No se encontro registro'
+                else:
+                    pm10 = data['data']['iaqi']['pm10']['v']
+                if 'pm25' not in data['data']['iaqi']:
+                    pm25 = 'No se encontro registro'
+                else:
+                    pm25 = data['data']['iaqi']['pm25']['v']
                 print(f"La calidad aire del aire en {direccion} es: {calidad_aire}, codigo{code}")
                 respuesta_ai = enviarCalidadAirea(calidad_aire)
                 dic['aqi'] = calidad_aire
@@ -159,7 +201,6 @@ def obtener_calidad_aire(ciudad, token_aqi):
         return JsonResponse({'error': f'Hubo un error al obtener la información: {e}'})
 
 
-
 def enviarCalidadAirea(calidad_aire):
     if 0 <= calidad_aire <= 50:
         res = {'res':'La calidad aire del Aire es Buena, no se anticipan impactos a la salud cuando la calidad aire del aire se encuentra en este intervalo.','calidad': 'Excelente'}
@@ -170,15 +211,9 @@ def enviarCalidadAirea(calidad_aire):
     elif 101 <= calidad_aire <= 150:
         res = {'res':'La calidad aire del Aire No es saludable para grupos sensibles. Los miembros de grupos sensibles pueden experimentar efectos sobre la salud. No es probable que el público en general se vea afectado. Los niños y adultos activos y las personas con enfermedades respiratorias, como asma, deben limitar el esfuerzo prolongado al aire libre.', 'calidad': 'No saludables para grupos sensibles'}
         return res
-    
     elif 151 <= calidad_aire <= 200:
-        res = {'res': 
-               'La calidad_aire del Aire es insalubre.Todo el mundo puede empezar a experimentar efectos sobre la salud; Los miembros de grupos sensibles pueden experimentar efectos más graves para la salud. Los niños y adultos activos y las personas con enfermedades respiratorias, como asma, deben evitar el esfuerzo prolongado al aire libre; todos los demás, especialmente los niños, deben limitar el esfuerzo prolongado al aire libre.',
-               'calidad':
-               'Insalubre'
-        }
-        return res['respuesta_ai']
-    
+        res = {'res': 'La calidad aire del Aire es insalubre.Todo el mundo puede empezar a experimentar efectos sobre la salud; Los miembros de grupos sensibles pueden experimentar efectos más graves para la salud. Los niños y adultos activos y las personas con enfermedades respiratorias, como asma, deben evitar el esfuerzo prolongado al aire libre; todos los demás, especialmente los niños, deben limitar el esfuerzo prolongado al aire libre.','calidad':'Insalubre'}
+        return res
     elif 201 <= calidad_aire <= 300:
         res = {'res':'La calidad aire del Aire muy poco saludable. Advertencias sanitarias de condiciones de emergencia. Es más probable que toda la población se vea afectada. Los niños y adultos activos y las personas con enfermedades respiratorias, como asma, deben evitar todo esfuerzo al aire libre; todos los demás, especialmente los niños, deben limitar el esfuerzo al aire libre.', 'calidad':'Dañino'}
         return res
@@ -186,7 +221,6 @@ def enviarCalidadAirea(calidad_aire):
         res = {'res':'La calidad aire del Aire es peligroso. Alerta de salud: todos pueden experimentar efectos de salud más graves. Todo el mundo debería evitar todo esfuerzo al aire libre.', 'calidad': 'Muy Dañino'}
         return res
     
-
 
 @csrf_exempt
 def recibir_ubicacion(request):

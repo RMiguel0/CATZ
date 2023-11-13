@@ -1,5 +1,6 @@
 from django.db import models
 import requests
+from django.contrib.auth.models import User
 
 mapbox_access_token = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dDdybThnMmkifQ.uhdlXK3odioAdWo0OOogwA'
 
@@ -9,6 +10,7 @@ class Direcciones(models.Model):
     Direccion = models.TextField()
     Lat = models.FloatField()
     Long = models.FloatField()
+    user= models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def procesar_direccion(request):
         self.Direccion = direccion
@@ -28,3 +30,4 @@ class Direcciones(models.Model):
     
     def __str__(self):
         return str(self.obtener_coordenadas())
+    

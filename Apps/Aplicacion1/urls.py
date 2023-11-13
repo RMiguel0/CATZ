@@ -8,7 +8,6 @@ urlpatterns = [
     path('login/', views.signup, name='login'),
     path('profile/', views.profile, name='profile'),
     path('logout/', views.singout, name='singout'),
-    path('clima/', views.clima, name='aire'),
     path('watch/', views.recibir_ubicacion, name='home1'),
 ]
 
