@@ -9,6 +9,8 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('logout/', views.singout, name='singout'),
     path('watch/', views.recibir_ubicacion, name='home1'),
+    path('actualizar_aqi/', views.actializaraqi, name='actualizaraqi'),
+
 ]
 
 if settings.DEBUG:

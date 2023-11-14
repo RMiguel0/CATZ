@@ -11,6 +11,11 @@ class ubicaciones(models.Model):
     Lat = models.FloatField()
     Long = models.FloatField()
     user= models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    calidad_aire = models.IntegerField(default=0)
+
+    def actualizar_calidad_aire(self, nuevo_valor):
+        self.calidad_aire = nuevo_valor
+        self.save()
 
     def procesar_direccion(request):
         self.Direccion = direccion

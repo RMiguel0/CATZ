@@ -48,31 +48,42 @@ def signup(request):
 @login_required
 def profile(request):
     user = request.user
-    if request.method =='POST':
+    token_aqi = "a9fa736d75e0f33dc4a9ba18292eab99fa46eb4d"
+    if request.method == 'POST':
         ubicacion = request.POST.get('city')
-        coordenadas = obtener_coordenadas(ubicacion)
-        lat = coordenadas[0]
-        longi = coordenadas[1]
-        nuevo_usuario = ubicaciones(Direccion= ubicacion, Lat= lat, Long= longi, user=user)
-        nuevo_usuario.save()
-        #return JsonResponse({'success': True})
+        # Verificar si la ubicación ya existe para el usuario actual
+        if not ubicaciones.objects.filter(user=user, Direccion=ubicacion).exists():
+            resaqi = obtener_calidad_aire(ubicacion, token_aqi)
+            aqi = resaqi['aqi']
+            coordenadas = obtener_coordenadas(ubicacion)
+            lat = coordenadas[0]
+            longi = coordenadas[1]
+            nuevo_usuario = ubicaciones(
+                Direccion=ubicacion,
+                Lat=lat,
+                Long=longi,
+                calidad_aire=aqi,
+                user=user
+            )
+            nuevo_usuario.save()
+
     try:
         direcciones = ubicaciones.objects.filter(user=user)
         atributos_direcciones = []
 
         # Itera sobre las direcciones y almacena sus atributos en la lista
-        for sitios in direcciones:
+        for sitio in direcciones:
             atributos_direccion = {
-                'direccion': sitios.Direccion,
-                #'latitud': direccion.Lat,
-                #'longitud': direccion.Long,
-                # Agrega más atributos según sea necesario
+                'direccion': sitio.Direccion,
+                'aqi':sitio.calidad_aire,
             }
             atributos_direcciones.append(atributos_direccion)
+        print(atributos_direcciones)
     except:
         # Manejar el caso en el que no se encuentra ninguna dirección
         atributos_direcciones = None
-    return render(request, 'profile.html',{
+
+    return render(request, 'profile.html', {
         'direcciones': atributos_direcciones,
     })
 
@@ -236,3 +247,10 @@ def recibir_ubicacion(request):
         return JsonResponse({'res':calidad_aire1})
         
         #return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def actializaraqi(request, ubicacion_id):
+    ubicacion = ubicaciones.objects.get(id=ubicacion_id)
+    nuevaaqi = obtener_calidad_aire(ubicacion)
+    ubicacion.calidad_aire.nombre = nuevaaqi
+    ubicacion.calidad_aire.save()
+    return JsonResponse({'aqi': nuevaaqi})
