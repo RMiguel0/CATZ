@@ -58,18 +58,18 @@ def profile(request):
         #return JsonResponse({'success': True})
     try:
         direcciones = ubicaciones.objects.filter(user=user)
-        atributos_ubicaciones = []
+        atributos_direcciones = []
 
         # Itera sobre las direcciones y almacena sus atributos en la lista
-        for ubicaciones in direcciones:
+        for sitios in direcciones:
             atributos_direccion = {
-                'direccion': ubicaciones.Direccion,
+                'direccion': sitios.Direccion,
                 #'latitud': direccion.Lat,
                 #'longitud': direccion.Long,
                 # Agrega más atributos según sea necesario
             }
-            atributos_ubicaciones.append(atributos_direccion)
-    except ubicaciones.DoesNotExist:
+            atributos_direcciones.append(atributos_direccion)
+    except:
         # Manejar el caso en el que no se encuentra ninguna dirección
         atributos_direcciones = None
     return render(request, 'profile.html',{
