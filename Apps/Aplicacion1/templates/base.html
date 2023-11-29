@@ -29,6 +29,7 @@ body {
         </div>
         <ul>
             <li><a href="{% url 'home' %}">Inicio</a></li>
+            <li><a href="{% url 'viaje' %}">Viajes</a></li>
             {% if not user.is_authenticated %}
             <li><a href="/singin">Ingresar</a></li>
             <li><a href="{% url 'login' %}">Registrarme</a></li>

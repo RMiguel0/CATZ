@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import ubicaciones
+import json
 
 
 # Create your views here.
@@ -112,10 +113,6 @@ def signin(request):
             return redirect('home')
         
 
-def clima(request):
-    return render(request, "clima.html")
-
-
 mapbox_access_token = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dDdybThnMmkifQ.uhdlXK3odioAdWo0OOogwA'
 def obtener_coordenadas(dirección):
     url = f'https://api.mapbox.com/geocoding/v5/mapbox.places/{dirección}.json?'
@@ -213,6 +210,10 @@ def obtener_calidad_aire(ciudad, token_aqi):
 
 
 def enviarCalidadAirea(calidad_aire):
+    if calidad_aire == '-':
+        print('ola')
+        res = {'None'}
+        return res
     if 0 <= calidad_aire <= 50:
         res = {'res':'La calidad aire del Aire es Buena, no se anticipan impactos a la salud cuando la calidad aire del aire se encuentra en este intervalo.','calidad': 'Excelente'}
         return res
@@ -254,3 +255,19 @@ def actializaraqi(request, ubicacion_id):
     ubicacion.calidad_aire.nombre = nuevaaqi
     ubicacion.calidad_aire.save()
     return JsonResponse({'aqi': nuevaaqi})
+
+
+@csrf_exempt
+def viaje(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            inicio = data.get('origin')
+            final = data.get('destination')
+            print(inicio, final)
+
+            return JsonResponse({'status': 'success'})
+        except json.JSONDecodeError as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return render(request, 'viajes.html')

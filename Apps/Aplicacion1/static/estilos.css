@@ -1,9 +1,9 @@
 header {
-    display: flex;
-    position: static;
+    display: flex-end;
+    position: absolute;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 20px;
     top: 0;
     left: 0;
     width: 100%;
@@ -35,11 +35,13 @@ header ul
     display:flex;
     justify-content: center;
     align-items: center;
+    margin: 0;
 }
 header ul li 
 {
     List-styLe: none;
     margin-Left: 20px;
+    margin-right: 10px;
 }
 header ul li a
 {
@@ -91,4 +93,11 @@ section img
     header ul li a{
         padding: 10px 0px;
     }
+}
+
+.formulario-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* O ajusta la altura según tus necesidades */
 }

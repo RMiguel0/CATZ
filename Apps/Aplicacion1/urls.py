@@ -10,6 +10,7 @@ urlpatterns = [
     path('logout/', views.singout, name='singout'),
     path('watch/', views.recibir_ubicacion, name='home1'),
     path('actualizar_aqi/', views.actializaraqi, name='actualizaraqi'),
+    path('viaje/', views.viaje, name='viaje'),
 
 ]
 

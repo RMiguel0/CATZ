@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block content %}
-<h1>Singin</h1>
+<link rel="stylesheet" type="text/css" href="{% static 'inicio.css' %}"> 
 
-<form action="/singin/" method="POST">
-    {% csrf_token %}
-    {{form.as_p}}
-    <button>
-        Sing In
-    </button>
-</form>
+
+<div class="formulario">
+    <form action="/singin/" method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button>
+            Sing In
+        </button>
+    </form>    
+</div>
 
 {{error}}
 

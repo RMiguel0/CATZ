@@ -14,7 +14,7 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" 
-        type="text/css">
+        type="text/css">      
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
     <link rel="stylesheet" href="{% static '/style_widdget.css' %}">                                       
@@ -105,8 +105,9 @@
         navigator.geolocation.getCurrentPosition(successLocation, erroLocation, { enableHighAccuracy: true });
 
         function successLocation(position) {
-            console.log(position)
-            setupMap([position.coords.longitude, position.coords.latitude])
+            console.log(position);
+            setupMap([position.coords.longitude, position.coords.latitude]);
+            locationSearched = true;
         }
 
         function erroLocation() {
@@ -135,7 +136,7 @@
         document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
         const nav = new mapboxgl.NavigationControl();
-        map.addControl(nav)
+        map.addControl(nav);
 
         _aqiFeed({ container: "city-aqi-container", 
                                 city: selectedCity, 
@@ -208,6 +209,7 @@
 
                     } else {
                         console.error('Error al enviar la ubicación');
+                        console.log(responseData)
                         if (json.cod === '404') {
                             container.style.height = '400px';
                             aqiBox.style.display = 'none';
@@ -240,6 +242,8 @@
                         return '../static/imagenes/5.png';
                     case 'Muy Dañino':
                         return '../static/imagenes/6.png';
+                    case 'None':
+                        return '../static/imagenes/404.png';    
                     default:
                         return '';
                 }
