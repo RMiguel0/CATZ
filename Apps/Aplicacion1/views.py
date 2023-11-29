@@ -50,6 +50,7 @@ def signup(request):
 def profile(request):
     user = request.user
     token_aqi = "a9fa736d75e0f33dc4a9ba18292eab99fa46eb4d"
+    actualizar_calidad_aire_perfil(request)
     if request.method == 'POST':
         ubicacion = request.POST.get('city')
         # Verificar si la ubicación ya existe para el usuario actual
@@ -249,11 +250,29 @@ def recibir_ubicacion(request):
         
         #return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+def actualizar_calidad_aire_perfil(request):
+    user = request.user
+    ubicaciones_usuario = ubicaciones.objects.filter(user=user)
+    for ubicacion in ubicaciones_usuario:
+        calidad_aire_actualizada = obtener_calidad_aire(ubicacion.Direccion, token_aqi)
+        ubicacion.calidad_aire = calidad_aire_actualizada.get('aqi', 0)  
+        ubicacion.save()
+    ubicaciones_actualizadas = ubicaciones.objects.filter(user=user)
+    detalles_ubicaciones = []
+    for sitio in ubicaciones_actualizadas:
+        detalle_ubicacion = {
+            'direccion': sitio.Direccion,
+            'aqi': sitio.calidad_aire,
+        }
+        detalles_ubicaciones.append(detalle_ubicacion)
+    return detalles_ubicaciones
+
+
 def actializaraqi(request, ubicacion_id):
     ubicacion = ubicaciones.objects.get(id=ubicacion_id)
-    nuevaaqi = obtener_calidad_aire(ubicacion)
-    ubicacion.calidad_aire.nombre = nuevaaqi
-    ubicacion.calidad_aire.save()
+    nuevaaqi = obtener_calidad_aire(ubicacion.Direccion, token_aqi)
+    ubicacion.calidad_aire = nuevaaqi.get('aqi', 0)  
+    ubicacion.save()
     return JsonResponse({'aqi': nuevaaqi})
 
 
