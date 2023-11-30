@@ -18,6 +18,7 @@ body {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Agbalumo:400,700&display=swap">
     <link rel="stylesheet" type="text/css" href="{% static 'estilos.css' %}"> 
     <title>CATZ</title>
 </head>
@@ -31,7 +32,7 @@ body {
             <li><a href="{% url 'home' %}">Inicio</a></li>
             <li><a href="{% url 'viaje' %}">Viajes</a></li>
             {% if not user.is_authenticated %}
-            <li><a href="/singin">Ingresar</a></li>
+            <li><a href="{% url 'singin' %}">Ingresar</a></li>
             <li><a href="{% url 'login' %}">Registrarme</a></li>
             {% else %}
             <li><a href="{% url 'singout' %}">Cerrar Sesión</a></li>
