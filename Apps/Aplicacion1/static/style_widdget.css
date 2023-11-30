@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+*{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "poppins", sans-serif;
+    font-weight: 400px;
+    scroll-behavior: smooth;
+}
+
+
+body{
+    height: 100vh;
+    width: 100%;
+    display: center;
+    align-items: center;
+    justify-content: left;
+    background: url('imagenes/fondo_dia.jpg')no-repeat;
+    background-position: center;
+    background-size: cover;
+    backdrop-filter: blur(5px);
+}
+
+.map{
+    position: absolute;
+    top: 70%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 50%;
+    border-radius: 10px;
+    }
+
+.geocoder {
+    position: absolute;
+    z-index: 999;
+    width: 50%;
+    left: 50%;
+    margin-left: -25%;
+    top: 12%;
+    border-radius: 10px;
+
+}
+
+.mapboxgl-ctrl-geocoder {
+    min-width: 80%;
+    border-radius: 10px;
+
+}
+
+.container{
+    position: absolute;
+    top: 20%;
+    width: 400px;
+    height: 105px;
+    margin-left: 40px;
+    background: #fff;
+    padding: 28px 32px;
+    overflow: hidden;
+    border-radius: 18px;
+    font-family: "poppins", sans-serif;
+    transition: 0.6s ease-out;
+}
+
+.pointer {
+    position: relative;
+}
+
+.pointer i {
+    color: #06283D;
+    font-size: 50px;
+}
+
+.ubicacion {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 2;
+}
+
+span.ubicacion{
+    color: #06283D;
+    position: absolute;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.ubicacion p {
+    color: #06283D;
+    font-size: 90%;
+    font-weight: 500;
+    text-transform: capitalize;
+    margin-top: 10px; /* Ajusta el espacio entre .ubicacion y el texto según tus necesidades */
+}
+
+
+.aqi-box span{
+    width: 100%;
+    height: min-content;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.aqi-box{
+    text-align: center;
+}
+
+.aqi-box img{
+    width: 60%;
+    margin-top: 30px;
+}
+
+.aqi-box .temperature{
+    position: relative;
+    color: #06283D;
+    font-size: 4rem;
+    font-weight: 800;
+    margin-top: 30px;
+    margin-left: -16px;
+}
+
+.aqi-box .temperature span{
+    position: absolute;
+    margin-left: 4px;
+    font-size: 1.5rem;
+}
+
+.aqi-box .description{
+    color: #06283D;
+    font-size: 22px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.aqi-details{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.aqi-details .humidity, .aqi-details .wind{
+    display: flex;
+    align-items: center;
+    width: 50%;
+    height: 100px;
+}
+
+.aqi-details .humidity{
+    padding-left: 20px;
+    justify-content: flex-start;
+}
+
+.aqi-details .wind{
+    padding-right: 20px;
+    justify-content: flex-end;
+}
+
+.aqi-details i{
+    color: #06283D;
+    font-size: 26px;
+    margin-right: 10px;
+    margin-top: 6px;
+}
+
+.aqi-details span{
+    color: #06283D;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.aqi-details p{
+    color: #06283D;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.not-found{
+    width: 100%;
+    text-align: center;
+    margin-top: 50px;
+    scale: 0;
+    opacity: 0;
+    display: none;
+}
+
+.not-found img{
+    width: 70%;
+}
+
+.not-found p{
+    color: #06283D;
+    font-size: 22px;
+    font-weight: 500;
+    margin-top: 12px;
+}
+
+.aqi-box, .aqi-details{
+    scale: 0;
+    opacity: 0;
+}
+
+.fadeIn{
+    animation: 0.5s fadeIn forwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes fadeIn{
+    to {
+        scale: 1;
+        opacity: 1;
+    }
+}
+
+
+.texto {
+    position: fixed;
+    width: auto;
+    height: auto;
+    background: rgba(255, 255, 255, 0.8); /* Fondo blanco transparente */
+    padding: 28px 32px;
+    overflow: hidden;
+    border-radius: 18px;
+    font-family: "poppins", sans-serif;
+    transition: 0.6s ease-out;
+    left: 55%; /* Centrar horizontalmente */
+    top: 20%; /* Ajustar la posición vertical según tus necesidades */
+    transform: translateX(-50%);
+    z-index: 998; /* Asegura que esté por encima del mapa u otros elementos */
+}
+
+.texto p {
+    color: #06283D;
+    font-size: 100%;
+    font-weight: 500;
+    margin-top: 10px;
+}
