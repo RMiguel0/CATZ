@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" type="text/css">
+<link rel="stylesheet" href="{% static '/viajes.css' %}">
+</head>
+<body>
+    <div id="map" class="map"></div>
+
+    <!-- Agregar un control de direcciones -->
+    <div id="directions" class="directions-container">
+        <div id="directions-inputs" class="directions-inputs"></div>
+        <div id="directions-instructions" class="directions-instructions"></div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dDdybThnMmkifQ.uhdlXK3odioAdWo0OOogwA';
+
+        navigator.geolocation.getCurrentPosition(successLocation, erroLocation, { enableHighAccuracy: true });
+
+        var directions = null;
+
+        function successLocation(position) {
+            console.log(position);
+            setupMap([position.coords.longitude, position.coords.latitude]);
+            locationSearched = true;
+        }
+
+        function erroLocation() {
+            setupMap([-70.654191, -33.44395])
+        }
+
+        function setupMap(center) {
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: center,
+                zoom: 15
+            });
+
+            // Agregar un control de direcciones
+            const nav = new mapboxgl.NavigationControl();
+            map.addControl(nav)
+
+            directions = new MapboxDirections({
+                accessToken: mapboxgl.accessToken,
+                language: 'es',
+                unit: 'metric',
+                controls: {
+                    inputs: 'directions-inputs',
+                    instructions: 'directions-instructions'
+                },
+                destination: [center[0],center[1]]
+            });
+
+            map.addControl(directions, 'top-left');
+
+            directions.on('route', function (e) {
+                var route = e.route[0];
+                console.log('Ruta calculada:', route);
+
+                // Obtener el punto de partida y destino desde la ruta
+                var origin = {
+                    coordinates: route.legs[0].steps[0].maneuver.location.reverse()
+                };
+
+                var destination = {
+                    coordinates: route.legs[0].steps[route.legs[0].steps.length - 1].maneuver.location.reverse()
+                };
+                console.log(origin,destination)
+                // Enviar ambos puntos al servidor
+                sendLocationToServer(origin, destination);
+            });
+        }
+
+        function sendLocationToServer(origin, destination) {
+            fetch('/viaje/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ origin: origin, destination: destination })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Respuesta del servidor:', data);
+            })
+            .catch(error => {
+                console.error('Error al enviar la ubicación:', error);
+            });
+        }
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+
+</body>
+</html>
+
+{% endblock %}
