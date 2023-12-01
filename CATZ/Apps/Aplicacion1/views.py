@@ -145,10 +145,14 @@ def calidad_coor(coords):
 
 
 def obtener_calidad_aire(ciudad, token_aqi):
-    direccion = ciudad
-    base_url = "https://api.waqi.info/feed/"
-    url = f"{base_url}{direccion}/?token={token_aqi}"
-    dic = {}
+    if ciudad == 'Santiago':
+        url = "https://api.waqi.info/feed/A410194/?token=a9fa736d75e0f33dc4a9ba18292eab99fa46eb4d"
+        dic = {}
+    else:
+        direccion = ciudad
+        base_url = "https://api.waqi.info/feed/"
+        url = f"{base_url}{direccion}/?token={token_aqi}"
+        dic = {}
 
     try:
         response = requests.get(url)
@@ -165,7 +169,6 @@ def obtener_calidad_aire(ciudad, token_aqi):
                 pm25 = 'No se encontro registro'
             else:
                 pm25 = data['data']['iaqi']['pm25']['v']
-            print(f"La calidad aire del aire en {direccion} es: {calidad_aire}, codigo{code}")
 
             # Ahora, enviamos la calidad_aire del aire a OpenAI para obtener una respuesta_ai
             respuesta_ai = enviarCalidadAirea(calidad_aire)
@@ -190,7 +193,6 @@ def obtener_calidad_aire(ciudad, token_aqi):
                     pm25 = 'No se encontro registro'
                 else:
                     pm25 = data['data']['iaqi']['pm25']['v']
-                print(f"La calidad aire del aire en {direccion} es: {calidad_aire}, codigo{code}")
                 respuesta_ai = enviarCalidadAirea(calidad_aire)
                 dic['aqi'] = calidad_aire
                 dic['res'] = respuesta_ai['res']
@@ -212,7 +214,6 @@ def obtener_calidad_aire(ciudad, token_aqi):
 
 def enviarCalidadAirea(calidad_aire):
     if calidad_aire == '-':
-        print('ola')
         res = {'None'}
         return res
     if 0 <= calidad_aire <= 50:
@@ -278,16 +279,28 @@ def actializaraqi(request, ubicacion_id):
 
 @csrf_exempt
 def viaje(request):
-    if request.method == 'POST':
+    if request.method == 'GET':
+        return render(request, 'viajes.html')
+    else:
         try:
             data = json.loads(request.body.decode('utf-8'))
             inicio = data.get('origin')
+            inicio = inicio['coordinates']
             final = data.get('destination')
-            print(inicio, final)
-
-
-            return JsonResponse({'status': 'success'})
+            final = final['coordinates']
+            data_inicio = calidad_coor(inicio)
+            data_final = calidad_coor(final)
+            aqi_inicio = data_inicio['data']['aqi']
+            aqi_final = data_final['data']['aqi']
+            promedio = round((aqi_final+aqi_inicio)/2)
+            mensaje = enviarCalidadAirea(promedio)
+            dic = {}
+            if 'res' not in dic:
+                dic['res'] = mensaje['res']
+            if 'description' not in dic:
+                dic['description'] = mensaje['calidad']
+            if 'promedio' not in dic:
+                dic['aqi'] = promedio
+            return JsonResponse({'respuesta':dic})
         except json.JSONDecodeError as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
-
-    return render(request, 'viajes.html')

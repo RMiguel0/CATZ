@@ -4,15 +4,15 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
-<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
-<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" type="text/css">
-<link rel="stylesheet" href="{% static '/viajes.css' %}">
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+        <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
+        <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" type="text/css">
+        <link rel="stylesheet" href="{% static '/viajes.css' %}">
+    </head>    
 <body>
     <div id="map" class="map"></div>
 
@@ -22,7 +22,26 @@
         <div id="directions-instructions" class="directions-instructions"></div>
     </div>
 
+    <div class="container">
+        <div class="pointer">
+            <p calss="texto">El promedio de tu viaje es:</p>
+        </div>
+        <div class="not-found">
+            <img src="{% static 'imagenes/404.png' %}">
+            <p>Oops! Ubicación invalida :/</p>
+        </div>
+
+        <div class="aqi-box">
+            <img src="">
+            <p class="temperature"></p>
+            <p class="description"></p>
+        </div>
+    </div>
     <script>
+        const container = document.querySelector('.container');
+        const aqiBox = document.querySelector('.aqi-box');
+        const error404 = document.querySelector('.not-found');
+
         mapboxgl.accessToken = 'pk.eyJ1IjoibXJpdmVybzAwIiwiYSI6ImNsbG11NWptbjF0ZmIzcXI2dDdybThnMmkifQ.uhdlXK3odioAdWo0OOogwA';
 
         navigator.geolocation.getCurrentPosition(successLocation, erroLocation, { enableHighAccuracy: true });
@@ -47,7 +66,6 @@
                 zoom: 15
             });
 
-            // Agregar un control de direcciones
             const nav = new mapboxgl.NavigationControl();
             map.addControl(nav)
 
@@ -91,14 +109,73 @@
                 },
                 body: JSON.stringify({ origin: origin, destination: destination })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la solicitud al servidor');
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('Respuesta del servidor:', data);
+                console.log('Respuesta del servidor:', data.respuesta);
+                var descripcion = data.respuesta.description
+
+                const image = document.querySelector('.aqi-box img');
+                const temperature = document.querySelector('.aqi-box .temperature');
+                const description = document.querySelector('.aqi-box .description');
+
+                image.src = getAqiImageSrc(descripcion);
+                temperature.innerHTML = data.respuesta.aqi;
+                description.innerHTML = data.respuesta.description;
+
+                var sugerenciaElement = document.getElementById('sugerenciaPlaceholder');
+
+                if (sugerenciaElement) {
+                    sugerenciaElement.innerHTML = data.respuesta.res;
+                }
+
+                // Mostrar elementos
+                aqiBox.style.display = '';
+                aqiBox.classList.add('fadeIn');
+                container.style.height = '590px';
             })
             .catch(error => {
-                console.error('Error al enviar la ubicación:', error);
+                console.error('Error al enviar la ubicación o al procesar la respuesta del servidor:', error);
+
+                // Manejo específico para código de respuesta 404
+                if (error.message.includes('404')) {
+                    container.style.height = '400px';
+                    aqiBox.style.display = 'none';
+                    error404.style.display = 'block';
+                    error404.classList.add('fadeIn');
+                } else {
+                    // Otros errores no relacionados con 404
+                    error404.style.display = 'none';
+                    error404.classList.remove('fadeIn');
+                }
             });
+    }
+
+        function getAqiImageSrc(description) {
+            switch (description) {
+                case 'Excelente':
+                    return '../static/imagenes/1.png';
+                case 'Moderada':
+                    return '../static/imagenes/2.png';
+                case 'No saludables para grupos sensibles':
+                    return '../static/imagenes/3.png';
+                case 'Insalubre':
+                    return '../static/imagenes/4.png';
+                case 'Dañino':
+                    return '../static/imagenes/5.png';
+                case 'Muy Dañino':
+                    return '../static/imagenes/6.png';
+                case 'None':
+                    return '../static/imagenes/404.png';    
+                default:
+                    return '';
+            }
         }
+
         function getCookie(name) {
             var cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -114,6 +191,7 @@
             return cookieValue;
         }
     </script>
+    <script src="https://kit.fontawesome.com/7c8801c017.js" crossorigin="anonymous"></script>
 
 </body>
 </html>
