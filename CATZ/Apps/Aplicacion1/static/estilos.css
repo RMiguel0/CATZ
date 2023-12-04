@@ -29,8 +29,8 @@ header {
     font-size: 30px; /* Ajusta el tamaño de fuente a tu gusto */
     color:#fff; /* Cambia el color del texto según tu preferencia */
     font-family: 'Agbalumo', sans-serif;
-
 }
+
 header ul
 {
     display:flex;
